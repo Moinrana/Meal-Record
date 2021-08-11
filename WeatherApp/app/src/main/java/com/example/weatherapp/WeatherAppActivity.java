@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -20,6 +21,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -45,7 +47,7 @@ public class WeatherAppActivity extends AppCompatActivity {
     private FloatingActionButton refreshBtn;
     private boolean textChanged = false;
     private int textCount = 0;
-
+    private Button callApiBtn;
     private String currLocation = "Dhaka";
     private CurrentWeatherService currWeatherService;
     private boolean fetchingWeather = false;
@@ -78,12 +80,14 @@ public class WeatherAppActivity extends AppCompatActivity {
         weatherContainer = findViewById(R.id.mainContainer);
         progressBar = findViewById(R.id.progressBar);
         refreshBtn = findViewById(R.id.refreshBtn);
-
+        callApiBtn = findViewById(R.id.callApiBtn);
         // initialize fusedLocation
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         locationRequest = LocationRequest.create();
+        assignListeners();
+    }
 
-
+    private void assignListeners() {
         etLocation.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -110,6 +114,14 @@ public class WeatherAppActivity extends AppCompatActivity {
                     searchForWeather(etLocation.getText().toString());
                     etLocation.setText("");
                 }
+            }
+        });
+
+        callApiBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent newActivity = new Intent(WeatherAppActivity.this,RetrofitPracticeActivity.class);
+                startActivity(newActivity);
             }
         });
 
@@ -156,7 +168,7 @@ public class WeatherAppActivity extends AppCompatActivity {
                             List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
                             currLocation = addresses.get(0).getLocality().trim();
                             searchForWeather(currLocation);
-                            storeDataInSP(currLocation);
+
 
                         } catch (IOException e) {
                             currLocation = getFromSP();
